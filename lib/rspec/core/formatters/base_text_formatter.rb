@@ -176,7 +176,7 @@ module RSpec
 
         VT100_COLOR_CODES = VT100_COLORS.values.to_set
 
-        EXCEPTION_FAILURE_CLASSES = [RSpec::Expectations::ExpectationNotMetError]
+        # EXCEPTION_FAILURE_CLASSES = []
 
         def color_code_for(code_or_symbol)
           if VT100_COLOR_CODES.include?(code_or_symbol)
@@ -203,7 +203,7 @@ module RSpec
         end
 
         def failure_color(text, example=nil)
-          if example && example.exception && (EXCEPTION_FAILURE_CLASSES.include? example.exception.class.ancestors)
+          if example && example.exception && ([RSpec::Expectations::ExpectationNotMetError].include? example.exception.class.ancestors)
             color(text, RSpec.configuration.expectation_failure_color)
           else
             color(text, RSpec.configuration.failure_color)
