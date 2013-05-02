@@ -133,6 +133,7 @@ MESSAGE
       add_setting :success_color
       add_setting :pending_color
       add_setting :failure_color
+      add_setting :expectation_failure_color
       add_setting :default_color
       add_setting :fixed_color
       add_setting :detail_color
@@ -200,6 +201,7 @@ MESSAGE
         @preferred_options = {}
         @seed = srand % 0xFFFF
         @failure_color = :red
+        @expectation_failure_color = :red
         @success_color = :green
         @pending_color = :yellow
         @default_color = :white

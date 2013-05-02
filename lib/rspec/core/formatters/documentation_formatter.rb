@@ -38,7 +38,7 @@ module RSpec
         end
 
         def failure_output(example, exception)
-          failure_color("#{current_indentation}#{example.description.strip} (FAILED - #{next_failure_index})")
+          failure_color("#{current_indentation}#{example.description.strip} (FAILED - #{next_failure_index})", example)
         end
 
         def next_failure_index

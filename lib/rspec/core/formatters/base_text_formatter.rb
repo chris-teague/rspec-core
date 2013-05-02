@@ -61,7 +61,7 @@ module RSpec
           output.puts
 
           failed_examples.each do |example|
-            output.puts(failure_color("rspec #{RSpec::Core::Metadata::relative_path(example.location)}") + " " + detail_color("# #{example.full_description}"))
+            output.puts(failure_color("rspec #{RSpec::Core::Metadata::relative_path(example.location)}", example) + " " + detail_color("# #{example.full_description}"))
           end
         end
 
@@ -89,7 +89,7 @@ module RSpec
 
           sorted_examples.each do |example|
             output.puts "  #{example.full_description}"
-            output.puts detail_color("    #{failure_color(format_seconds(example.execution_result[:run_time]))} #{failure_color("seconds")} #{format_caller(example.location)}")
+            output.puts detail_color("    #{failure_color(format_seconds(example.execution_result[:run_time]), example)} #{failure_color("seconds", example)} #{format_caller(example.location)}")
           end
         end
 
@@ -176,6 +176,8 @@ module RSpec
 
         VT100_COLOR_CODES = VT100_COLORS.values.to_set
 
+        EXCEPTION_FAILURE_CLASSES = [RSpec::Expectations::ExpectationNotMetError]
+
         def color_code_for(code_or_symbol)
           if VT100_COLOR_CODES.include?(code_or_symbol)
             code_or_symbol
@@ -200,8 +202,12 @@ module RSpec
           color_enabled? ? colorize(text, color_code) : text
         end
 
-        def failure_color(text)
-          color(text, RSpec.configuration.failure_color)
+        def failure_color(text, example=nil)
+          if example && example.exception && (EXCEPTION_FAILURE_CLASSES.include? example.exception.class.ancestors)
+            color(text, RSpec.configuration.expectation_failure_color)
+          else
+            color(text, RSpec.configuration.failure_color)
+          end
         end
 
         def success_color(text)
@@ -296,9 +302,10 @@ module RSpec
         def dump_failure_info(example)
           exception = example.execution_result[:exception]
           exception_class_name = exception_class_name_for(exception)
-          output.puts "#{long_padding}#{failure_color("Failure/Error:")} #{failure_color(read_failed_line(exception, example).strip)}"
-          output.puts "#{long_padding}#{failure_color(exception_class_name)}:" unless exception_class_name =~ /RSpec/
-          exception.message.to_s.split("\n").each { |line| output.puts "#{long_padding}  #{failure_color(line)}" } if exception.message
+
+          output.puts "#{long_padding}#{failure_color("Failure/Error:", example)} #{failure_color(read_failed_line(exception, example).strip, example)}"
+          output.puts "#{long_padding}#{failure_color(exception_class_name, example)}:" unless exception_class_name =~ /RSpec/
+          exception.message.to_s.split("\n").each { |line| output.puts "#{long_padding}  #{failure_color(line, example)}" } if exception.message
 
           if shared_group = find_shared_group(example)
             dump_shared_failure_info(shared_group)

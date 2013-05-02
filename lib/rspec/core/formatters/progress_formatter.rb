@@ -17,7 +17,7 @@ module RSpec
 
         def example_failed(example)
           super(example)
-          output.print failure_color('F')
+          output.print failure_color('F', example)
         end
 
         def start_dump
