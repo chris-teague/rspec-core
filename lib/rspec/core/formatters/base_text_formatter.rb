@@ -203,7 +203,7 @@ module RSpec
         end
 
         def failure_color(text, example=nil)
-          if example && example.exception && ([RSpec::Expectations::ExpectationNotMetError].include? example.exception.class.ancestors)
+          if example && example.exception && (example.exception.class.ancestors.include? RSpec::Expectations::ExpectationNotMetError)
             color(text, RSpec.configuration.expectation_failure_color)
           else
             color(text, RSpec.configuration.failure_color)
